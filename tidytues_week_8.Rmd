@@ -14,11 +14,52 @@ library(lubridate)
 library(tidytuesdayR)
 ```
 
-## IMPORTING THE DATA
+## IMPORTING & CLEANING THE DATA
 ```{r}
 tuesdata <- tidytuesdayR::tt_load(2022, week = 8)
 
 freedom <- tuesdata$freedom
 freedom
+
+# Explore the data----
+skim(freedom) #Data looks pretty clean
+```
+## Regional Analysis of freedom over the years
+```{r}
+freedom1 <- freedom %>%
+  mutate(freedom_index = CL + PR) %>% 
+  group_by(Region_Name,year) %>% 
+summarise(Total_FI = sum(freedom_index))
+
+freedom1 %>%
+  mutate(year = as.factor(year)) %>% 
+  ggplot(aes(year,Total_FI,group = Region_Name)) +
+  geom_point(aes(color = Region_Name),show.legend = FALSE)+
+  geom_line(aes(color = Region_Name), linetype = "solid",show.legend = FALSE) + 
+  facet_wrap(~Region_Name,scales = "free_y", ncol = 1)+
+  theme_bw()+
+  theme(
+    axis.ticks = element_line(linetype = "blank"),
+    panel.grid.major = element_line(linetype = "blank"),
+    panel.grid.minor = element_line(linetype = "blank"),
+    axis.text = element_text(family = "mono",face = "bold", colour = NA),
+    panel.background = element_rect(fill = "antiquewhite"),
+    plot.background = element_rect(fill = "antiquewhite"),
+    axis.text.x = element_text(family = "mono", size = 8.5, angle = 90),
+    legend.position = "none",
+    plot.subtitle = element_text(face = "italic",
+    colour = "black"), plot.caption = element_text(face = "bold",
+    colour = "black"), 
+    plot.title = element_text(size = 13,
+        face = "bold"),
+    ) +
+  labs(
+    title = "A Notable Increase in Political Rights & Civil liberties Across the Globe", 
+    subtitle = "Oceania Presents an Interesting Plot",
+    y = "Freedom Index",
+    X = "Year",
+    caption = "Data from Freedom House | Tidytue_wk 8 | Plot by Blake Analytics")
+
+
 ```
 
