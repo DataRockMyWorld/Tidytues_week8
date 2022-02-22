@@ -42,16 +42,14 @@ freedom1 %>%
     axis.ticks = element_line(linetype = "blank"),
     panel.grid.major = element_line(linetype = "blank"),
     panel.grid.minor = element_line(linetype = "blank"),
-    axis.text = element_text(family = "mono",face = "bold", colour = NA),
+    axis.text = element_text(family = "mono",face = "bold", colour = "black"),
     panel.background = element_rect(fill = "antiquewhite"),
     plot.background = element_rect(fill = "antiquewhite"),
     axis.text.x = element_text(family = "mono", size = 8.5, angle = 90),
     legend.position = "none",
-    plot.subtitle = element_text(face = "italic",
-    colour = "black"), plot.caption = element_text(face = "bold",
-    colour = "black"), 
-    plot.title = element_text(size = 13,
-        face = "bold"),
+    plot.subtitle = element_text(face = "italic", colour = "black"), 
+    plot.caption = element_text(face = "bold", colour = "black"), 
+    plot.title = element_text(size = 13,face = "bold"),
     ) +
   labs(
     title = "A Notable Increase in Political Rights & Civil liberties Across the Globe", 
@@ -61,5 +59,73 @@ freedom1 %>%
     caption = "Data from Freedom House | Tidytue_wk 8 | Plot by Blake Analytics")
 
 
+```
+
+## FREEDOM STATUS IN AFRICA
+```{r}
+
+West_Africa <- c( "Benin", "Burkina Faso", "Cape Verde", "Gambia", "Ghana", "Guinea", "Guinea-Bissau",
+                  "Ivory Coast", "Liberia", "Mali", "Mauritania", "Niger", "Nigeria", "Senegal", "Sierra Leone", "Togo")
+
+#Divide African countries into regions
+Central_Africa <- c("Burundi","Congo (Brazzaville)","Congo","Rwanda","Chad")
+Eastern_Africa <- c("Comoros","Ethiopia","Kenya","Madagascar","Mauritius","United Republic of Tanzania","Uganda","Djibouti","Eritrea","Somalia","Angola","South Sudan")
+Southern_Africa <- c("Botswana","Eswatini","Lesotho","Malawi","Mozambique","Namibia","South Africa","Zambia","Zimbabwe")
+North_Africa <- c("Morocco","Algeria","Tunisia", "Libya","Egypt","Sudan")
+Middle_Africa <- c("Angola","Cameroon","Central African Republic","Democratic Republic of the Congo","Equatorial Guinea","Gabon",
+                   "Sao Tome and Principe","Seychelles","")
+
+#Introduce the Sub_Region column
+
+freedom2 <- freedom %>% filter(Region_Name == "Africa") %>%
+  mutate(country = str_replace(country, "CÃƒÂ´te dÃ¢â‚¬â„¢Ivoire","Ivory Coast"),
+         country = str_replace(country,"Cabo Verde","Cape Verde")) %>% 
+  mutate(African_Subregion = case_when(
+  country %in% West_Africa ~ "West Africa",
+  country %in% Central_Africa ~ "Central Africa",
+  country %in% Eastern_Africa ~ "Eastern Africa",
+  country %in% Southern_Africa ~ "Southern Africa",
+  country %in% North_Africa ~ "North Africa",
+  country %in% Middle_Africa ~ "Middle Africa",
+  TRUE ~ as.character(country)
+)) 
+freedom2
+
+freedom2 %>% count(country,Status)
+
+# Plot
+freedom2 %>%
+  mutate(Status = recode(Status,
+                         "F" = "Free",
+                         "NF" = "Not Free",
+                         "PF" = "Partly Free")) %>% 
+  count(African_Subregion,Status) %>% 
+  ggplot(aes(Status,n,fill = Status)) +
+  geom_col(show.legend = TRUE)+
+  coord_polar()+
+  facet_wrap(~African_Subregion) +
+  theme_minimal(base_size = 9)+
+  theme(plot.title = element_text(hjust = 0.5, colour = "white", size = 20, margin = margin(b = 20)),
+        plot.caption = element_text(colour = "white", size = 9, hjust = .5, vjust = -30),
+        plot.background = element_rect(fill = "black"),
+        plot.margin = margin(1, 1, 2, 1, unit = "cm"),
+        
+        axis.text.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        
+        legend.title = element_text(colour = "white"),
+        legend.position = "bottom",
+        legend.justification = 0.5,
+        legend.text = element_text(colour = "white"),
+        
+        strip.text = element_text(colour = "white", face = "bold", size = 14),
+        
+        panel.spacing.y = unit(1, "lines"),
+        panel.background = element_rect(fill = "black"),
+        panel.grid = element_line(colour = "white")
+  ) 
+  
+  
 ```
 
